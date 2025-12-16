@@ -82,11 +82,13 @@ echo.
 echo ==========================================
 echo Passo 6: Deploy das Aplicacoes
 echo ==========================================
-kubectl apply -f k8s-tutorial/namespace.yaml
-kubectl apply -f k8s-tutorial/sqlserver.yaml
-kubectl apply -f k8s-tutorial/fcg-fixed.yaml
-kubectl apply -f k8s-tutorial/games.yaml
-kubectl apply -f k8s-tutorial/payments.yaml
+kubectl apply -f k8s-tutorial/namespace.yaml --validate=false
+timeout /t 5 /nobreak
+
+kubectl apply -f k8s-tutorial/sqlserver.yaml --validate=false
+kubectl apply -f k8s-tutorial/fcg-fixed.yaml --validate=false
+kubectl apply -f k8s-tutorial/games.yaml --validate=false
+kubectl apply -f k8s-tutorial/payments.yaml --validate=false
 
 echo.
 echo ==========================================
@@ -121,6 +123,14 @@ timeout /t 30 /nobreak
 
 echo.
 echo ==========================================
+echo Passo 11: Aplicando Auto Scaling (HPA)
+echo ==========================================
+kubectl apply -f k8s-tutorial/fcg-hpa.yaml
+kubectl apply -f k8s-tutorial/games-hpa.yaml
+kubectl apply -f k8s-tutorial/payments-hpa.yaml
+
+echo.
+echo ==========================================
 echo DEPLOY CONCLUIDO!
 echo ==========================================
 kubectl get services -n fcg-tutorial
@@ -129,6 +139,15 @@ echo Acesse os servicos:
 echo FCG:      http://^<EXTERNAL-IP^>/swagger
 echo Games:    http://^<EXTERNAL-IP^>/swagger
 echo Payments: http://^<EXTERNAL-IP^>/swagger
+echo.
+echo ==========================================
+echo Auto Scaling Configurado:
+echo ==========================================
+echo FCG:      1-5 replicas   (CPU: 70%%, MEM: 80%%)
+echo Games:    1-10 replicas  (CPU: 70%%, MEM: 80%%)
+echo Payments: 2-8 replicas   (CPU: 70%%, MEM: 80%%)
+echo.
+echo Para monitorar: kubectl get hpa -n fcg-tutorial
 echo.
 echo Para deletar tudo:
 echo az group delete --name %RESOURCE_GROUP% --yes --no-wait
