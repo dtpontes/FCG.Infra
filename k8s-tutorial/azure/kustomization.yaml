@@ -1,0 +1,45 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: fcg-tutorial
+
+resources:
+  - ../namespace.yaml
+  - ../sqlserver.yaml
+  - ../fcg-fixed.yaml
+  - ../games.yaml
+  - ../payments.yaml
+
+images:
+  - name: fcg-presentation:local
+    newName: dtpontes/fcgpresentation
+    newTag: latest
+  - name: games-presentation:local
+    newName: dtpontes/fcggamespresentation
+    newTag: latest
+  - name: payments-presentation:local
+    newName: dtpontes/fcgpaymentspresentation
+    newTag: latest
+
+patches:
+  - target:
+      kind: Service
+      name: fcg-service
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: LoadBalancer
+  - target:
+      kind: Service
+      name: games-service
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: LoadBalancer
+  - target:
+      kind: Service
+      name: payments-service
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: LoadBalancer

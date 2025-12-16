@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fcg-app
+  namespace: fcg-tutorial
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fcg-app
+  template:
+    metadata:
+      labels:
+        app: fcg-app
+    spec:
+      initContainers:
+      - name: wait-for-sql
+        image: mcr.microsoft.com/mssql-tools
+        command:
+        - "sh"
+        - "-c"
+        - "until /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 'Password123!' -Q \"SELECT 1\"; do echo waiting for sql; sleep 2; done"
+      containers:
+      - name: fcg-app
+        image: fcg-presentation:local
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: "Server=sqlserver;Database=FCGDatabase;User=sa;Password=Password123!;TrustServerCertificate=True;"
+        - name: ASPNETCORE_URLS
+          value: "http://+:8080"
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fcg-service
+  namespace: fcg-tutorial
+spec:
+  selector:
+    app: fcg-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: ClusterIP
