@@ -28,7 +28,7 @@ spec:
         - containerPort: 8080
         env:
         - name: ConnectionStrings__DefaultConnection
-          value: "Server=sqlserver;Database=FCGDatabase;User=sa;Password=Password123!;TrustServerCertificate=True;"
+          value: "Server=sqlserver;Database=fcg-payments-dev;User=sa;Password=Password123!;TrustServerCertificate=True;"
         - name: ASPNETCORE_URLS
           value: "http://+:8080"
         - name: ASPNETCORE_ENVIRONMENT

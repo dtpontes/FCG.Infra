@@ -1,0 +1,70 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sqlserver-init-job
+  namespace: fcg-tutorial
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: init-databases
+        image: mcr.microsoft.com/mssql-tools
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Waiting for SQL Server to be ready..."
+          
+          # Tentar conectar até conseguir (máximo 60 tentativas = 2 minutos)
+          for i in {1..60}; do
+            if /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P "Password123!" -Q "SELECT 1" &> /dev/null; then
+              echo "SQL Server is ready!"
+              break
+            fi
+            echo "Attempt $i: SQL Server not ready yet, waiting..."
+            sleep 2
+          done
+          
+          echo "Creating databases..."
+          
+          # Criar banco fcg
+          /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P "Password123!" -Q "
+          IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'fcg')
+          BEGIN
+              CREATE DATABASE fcg;
+              PRINT 'Database fcg created successfully';
+          END
+          ELSE
+          BEGIN
+              PRINT 'Database fcg already exists';
+          END
+          "
+          
+          # Criar banco fcg-games-dev
+          /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P "Password123!" -Q "
+          IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'fcg-games-dev')
+          BEGIN
+              CREATE DATABASE [fcg-games-dev];
+              PRINT 'Database fcg-games-dev created successfully';
+          END
+          ELSE
+          BEGIN
+              PRINT 'Database fcg-games-dev already exists';
+          END
+          "
+          
+          # Criar banco fcg-payments-dev
+          /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P "Password123!" -Q "
+          IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'fcg-payments-dev')
+          BEGIN
+              CREATE DATABASE [fcg-payments-dev];
+              PRINT 'Database fcg-payments-dev created successfully';
+          END
+          ELSE
+          BEGIN
+              PRINT 'Database fcg-payments-dev already exists';
+          END
+          "
+          
+          echo "=== All databases initialized successfully ==="

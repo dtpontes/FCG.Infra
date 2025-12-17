@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sqlserver-init
+  namespace: fcg-tutorial
+data:
+  init-databases.sql: |
+    -- Criar bancos de dados se não existirem
+    IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'fcg')
+    BEGIN
+        CREATE DATABASE fcg;
+        PRINT 'Database fcg created successfully';
+    END
+    
+    IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'fcg-games-dev')
+    BEGIN
+        CREATE DATABASE [fcg-games-dev];
+        PRINT 'Database fcg-games-dev created successfully';
+    END
+    
+    IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'fcg-payments-dev')
+    BEGIN
+        CREATE DATABASE [fcg-payments-dev];
+        PRINT 'Database fcg-payments-dev created successfully';
+    END
+    
+    PRINT 'All databases initialized successfully';

@@ -130,6 +130,17 @@ echo ==========================================
 echo Passo 9: Deploy dos Serviços
 echo ==========================================
 kubectl apply -f k8s-tutorial/sqlserver.yaml --validate=false
+
+echo Aguardando SQL Server ficar pronto...
+kubectl wait --namespace=fcg-tutorial --for=condition=ready pod -l app=sqlserver --timeout=120s
+
+echo.
+echo Criando bancos de dados...
+kubectl apply -f k8s-tutorial/sqlserver-init-job.yaml --validate=false
+kubectl wait --namespace=fcg-tutorial --for=condition=complete job/sqlserver-init-job --timeout=180s
+
+echo.
+echo Aplicando servicos...
 kubectl apply -f k8s-tutorial/fcg-fixed.yaml --validate=false
 kubectl apply -f k8s-tutorial/games.yaml --validate=false
 kubectl apply -f k8s-tutorial/payments.yaml --validate=false
