@@ -33,6 +33,50 @@ spec:
           value: "http://+:8080"
         - name: ASPNETCORE_ENVIRONMENT
           value: "Development"
+        # Service Bus Configuration (OPTIONAL - from Secret)
+        - name: ServiceBus__ConnectionString
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__ConnectionString
+              optional: true
+        - name: ServiceBus__SalesQueueName
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__SalesQueueName
+              optional: true
+        - name: ServiceBus__PaymentQueueName
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__PaymentQueueName
+              optional: true
+        - name: ServiceBus__PaymentResponseQueueName
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__PaymentResponseQueueName
+              optional: true
+        - name: ServiceBus__MaxConcurrentCalls
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__MaxConcurrentCalls
+              optional: true
+        - name: ServiceBus__MessageTimeoutSeconds
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__MessageTimeoutSeconds
+              optional: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
 ---
 apiVersion: v1
 kind: Service
