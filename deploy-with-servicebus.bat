@@ -24,6 +24,7 @@ set SERVICE_BUS_NAMESPACE=fcg-games-servicebus
 set SALES_QUEUE=sale-processing-queue
 set PAYMENT_QUEUE=payment-processing-queue
 set PAYMENT_RESPONSE_QUEUE=response-payment-processing-queue
+set APP_INSIGHTS_NAME=fcg-appinsights
 
 echo.
 echo ==========================================
@@ -84,12 +85,40 @@ echo ==========================================
 call az provider register --namespace Microsoft.ContainerService
 call az provider register --namespace Microsoft.Compute
 call az provider register --namespace Microsoft.Network
-timeout /t 60 /nobreak
+call az provider register --namespace microsoft.insights
+call az provider register --namespace microsoft.operationalinsights
+echo Aguardando providers (90 segundos)...
+timeout /t 90 /nobreak
+
+echo.
+echo ==========================================
+echo Passo 4.1: Criando Application Insights
+echo ==========================================
+echo Criando workspace do Application Insights...
+call az monitor app-insights component create ^
+    --app %APP_INSIGHTS_NAME% ^
+    --location %LOCATION% ^
+    --resource-group %RESOURCE_GROUP% ^
+    --kind web
+
+echo.
+echo Obtendo Instrumentation Key...
+for /f "tokens=*" %%i in ('az monitor app-insights component show --app %APP_INSIGHTS_NAME% --resource-group %RESOURCE_GROUP% --query instrumentationKey -o tsv') do set APPINSIGHTS_KEY=%%i
+
+echo.
+echo Obtendo Connection String do Application Insights...
+for /f "tokens=*" %%i in ('az monitor app-insights component show --app %APP_INSIGHTS_NAME% --resource-group %RESOURCE_GROUP% --query connectionString -o tsv') do set APPINSIGHTS_CONN=%%i
+
+echo Application Insights criado com sucesso!
 
 echo.
 echo ==========================================
 echo Passo 5: Criando Cluster AKS
 echo ==========================================
+echo.
+echo Obtendo Subscription ID...
+for /f "tokens=*" %%i in ('az account show --query id -o tsv') do set SUBSCRIPTION_ID=%%i
+
 call az aks create ^
     --resource-group %RESOURCE_GROUP% ^
     --name %CLUSTER_NAME% ^
@@ -113,7 +142,7 @@ timeout /t 5 /nobreak
 
 echo.
 echo ==========================================
-echo Passo 8: Criando Kubernetes Secret
+echo Passo 8: Criando Kubernetes Secrets
 echo ==========================================
 kubectl create secret generic servicebus-secrets ^
     --from-literal=ServiceBus__ConnectionString="%SERVICE_BUS_CONN%" ^
@@ -122,6 +151,12 @@ kubectl create secret generic servicebus-secrets ^
     --from-literal=ServiceBus__PaymentResponseQueueName="%PAYMENT_RESPONSE_QUEUE%" ^
     --from-literal=ServiceBus__MaxConcurrentCalls="5" ^
     --from-literal=ServiceBus__MessageTimeoutSeconds="300" ^
+    --namespace=fcg-tutorial ^
+    --dry-run=client -o yaml | kubectl apply -f -
+
+kubectl create secret generic appinsights-secrets ^
+    --from-literal=ApplicationInsights__InstrumentationKey="%APPINSIGHTS_KEY%" ^
+    --from-literal=ApplicationInsights__ConnectionString="%APPINSIGHTS_CONN%" ^
     --namespace=fcg-tutorial ^
     --dry-run=client -o yaml | kubectl apply -f -
 
@@ -140,10 +175,10 @@ kubectl apply -f k8s-tutorial/sqlserver-init-job.yaml --validate=false
 kubectl wait --namespace=fcg-tutorial --for=condition=complete job/sqlserver-init-job --timeout=180s
 
 echo.
-echo Aplicando servicos...
-kubectl apply -f k8s-tutorial/fcg-fixed.yaml --validate=false
-kubectl apply -f k8s-tutorial/games.yaml --validate=false
-kubectl apply -f k8s-tutorial/payments.yaml --validate=false
+echo Aplicando servicos com Application Insights...
+kubectl apply -f k8s-tutorial/fcg-with-apm.yaml --validate=false
+kubectl apply -f k8s-tutorial/games-with-apm.yaml --validate=false
+kubectl apply -f k8s-tutorial/payments-with-apm.yaml --validate=false
 
 echo.
 echo ==========================================
@@ -182,7 +217,7 @@ timeout /t 30 /nobreak
 
 echo.
 echo ==========================================
-echo DEPLOY CONCLUIDO COM SERVICE BUS!
+echo DEPLOY CONCLUIDO COM SERVICE BUS + APM!
 echo ==========================================
 kubectl get services -n fcg-tutorial
 echo.
@@ -191,6 +226,26 @@ echo Service Bus Configurado:
 echo ==========================================
 echo Namespace: %SERVICE_BUS_NAMESPACE%
 echo Filas: %SALES_QUEUE%, %PAYMENT_QUEUE%, %PAYMENT_RESPONSE_QUEUE%
+echo.
+echo ==========================================
+echo Application Insights Configurado:
+echo ==========================================
+echo Nome: %APP_INSIGHTS_NAME%
+echo Instrumentation Key: %APPINSIGHTS_KEY%
+echo.
+echo Portal do Application Insights:
+echo https://portal.azure.com/#@/resource/subscriptions/%SUBSCRIPTION_ID%/resourceGroups/%RESOURCE_GROUP%/providers/microsoft.insights/components/%APP_INSIGHTS_NAME%/overview
+echo.
+echo Link Direto (copie e cole no navegador):
+echo https://portal.azure.com/#view/AppInsightsExtension/ComponentDetailsBladeV2/ComponentId/%%2Fsubscriptions%%2F%SUBSCRIPTION_ID%%%2FresourceGroups%%2F%RESOURCE_GROUP%%%2Fproviders%%2Fmicrosoft.insights%%2Fcomponents%%2F%APP_INSIGHTS_NAME%
+echo.
+echo Para visualizar metricas em tempo real:
+echo - Acesse o portal acima
+echo - Live Metrics: Metricas em tempo real
+echo - Application Map: Visualizacao da arquitetura
+echo - Performance: Analise de performance
+echo - Failures: Analise de falhas
+echo - Logs: Query logs com KQL
 echo.
 echo Para deletar tudo:
 echo az group delete --name %RESOURCE_GROUP% --yes --no-wait

@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: games-app
+  namespace: fcg-tutorial
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: games-app
+  template:
+    metadata:
+      labels:
+        app: games-app
+    spec:
+      initContainers:
+      - name: wait-for-sql
+        image: mcr.microsoft.com/mssql-tools
+        command:
+        - "sh"
+        - "-c"
+        - "until /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 'Password123!' -Q \"SELECT 1\"; do echo waiting for sql; sleep 2; done"
+      containers:
+      - name: games-app
+        image: games-presentation:local
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: "Server=sqlserver;Database=fcg-games-dev;User=sa;Password=Password123!;TrustServerCertificate=True;"
+        - name: ASPNETCORE_URLS
+          value: "http://+:8080"
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        # Service Bus Configuration
+        - name: ServiceBus__ConnectionString
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__ConnectionString
+              optional: true
+        - name: ServiceBus__SalesQueueName
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__SalesQueueName
+              optional: true
+        - name: ServiceBus__MaxConcurrentCalls
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__MaxConcurrentCalls
+              optional: true
+        - name: ServiceBus__MessageTimeoutSeconds
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secrets
+              key: ServiceBus__MessageTimeoutSeconds
+              optional: true
+        # Application Insights Configuration
+        - name: ApplicationInsights__InstrumentationKey
+          valueFrom:
+            secretKeyRef:
+              name: appinsights-secrets
+              key: ApplicationInsights__InstrumentationKey
+        - name: ApplicationInsights__ConnectionString
+          valueFrom:
+            secretKeyRef:
+              name: appinsights-secrets
+              key: ApplicationInsights__ConnectionString
+        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: appinsights-secrets
+              key: ApplicationInsights__ConnectionString
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: games-service
+  namespace: fcg-tutorial
+spec:
+  selector:
+    app: games-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: ClusterIP
