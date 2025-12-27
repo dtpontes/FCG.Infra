@@ -1,46 +1,46 @@
-# ?? FCG Infrastructure - Deploy Completo
+# 🚀 FCG Infrastructure - Deploy Completo
 
 Infraestrutura como Código (IaC) para deploy de microsserviços FCG no Azure Kubernetes Service (AKS) com Application Performance Monitoring.
 
 ---
 
-## ?? **Estrutura do Projeto**
+## 📁 **Estrutura do Projeto**
 
 ```
 FCG.Infra/
-??? ?? deploy-with-servicebus.bat    # Script principal de deploy
-??? ?? get-appinsights-link.bat      # Obter link do Application Insights
-?
-??? ?? k8s-tutorial/                  # Manifestos Kubernetes
-?   ??? namespace.yaml                # Namespace fcg-tutorial
-?   ??? sqlserver.yaml                # SQL Server deployment
-?   ??? sqlserver-init-job.yaml       # Job para criar databases
-?   ?
-?   ??? fcg-with-apm.yaml             # FCG Service + APM
-?   ??? games-with-apm.yaml           # Games Service + APM
-?   ??? payments-with-apm.yaml        # Payments Service + APM
-?   ?
-?   ??? fcg-hpa.yaml                  # Auto Scaling - FCG
-?   ??? games-hpa.yaml                # Auto Scaling - Games
-?   ??? payments-hpa.yaml             # Auto Scaling - Payments
-?
-??? ?? Documentação/
-    ??? APM-README.md                 # Guia Application Insights
-    ??? apresentacao_fiap.md          # Apresentação técnica completa
-    ??? SERVICEBUS-README.md          # Guia Service Bus
-    ??? TROUBLESHOOTING-APPINSIGHTS.md # Troubleshooting APM
+├── 📜 deploy-with-servicebus.bat    # Script principal de deploy
+├── 📜 get-appinsights-link.bat      # Obter link do Application Insights
+│
+├── 📂 k8s-tutorial/                  # Manifestos Kubernetes
+│   ├── namespace.yaml                # Namespace fcg-tutorial
+│   ├── sqlserver.yaml                # SQL Server deployment
+│   ├── sqlserver-init-job.yaml       # Job para criar databases
+│   │
+│   ├── fcg-with-apm.yaml             # FCG Service + APM
+│   ├── games-with-apm.yaml           # Games Service + APM
+│   ├── payments-with-apm.yaml        # Payments Service + APM
+│   │
+│   ├── fcg-hpa.yaml                  # Auto Scaling - FCG
+│   ├── games-hpa.yaml                # Auto Scaling - Games
+│   └── payments-hpa.yaml             # Auto Scaling - Payments
+│
+└── 📂 Documentação/
+    ├── APM-README.md                 # Guia Application Insights
+    ├── apresentacao_fiap.md          # Apresentação técnica completa
+    ├── SERVICEBUS-README.md          # Guia Service Bus
+    └── TROUBLESHOOTING-APPINSIGHTS.md # Troubleshooting APM
 ```
 
 ---
 
-## ?? **Deploy Rápido**
+## 🎯 **Deploy Rápido**
 
 ### **1. Pré-requisitos**
 
-- ? Azure CLI instalado
-- ? kubectl instalado
-- ? Conta Azure ativa
-- ? Imagens Docker no DockerHub:
+- ✅ Azure CLI instalado
+- ✅ kubectl instalado
+- ✅ Conta Azure ativa
+- ✅ Imagens Docker no DockerHub:
   - `dtpontes/fcgpresentation:latest`
   - `dtpontes/fcggamespresentation:latest`
   - `dtpontes/fcgpaymentspresentation:latest`
@@ -56,7 +56,7 @@ deploy-with-servicebus.bat
 
 ---
 
-## ?? **O que será criado?**
+## 📊 **O que será criado?**
 
 | Recurso | Tipo | Finalidade |
 |---------|------|-----------|
@@ -74,7 +74,7 @@ deploy-with-servicebus.bat
 
 ---
 
-## ?? **Passo a Passo do Deploy**
+## 🔧 **Passo a Passo do Deploy**
 
 ### **Passo 1: Azure Resources**
 1. Login no Azure
@@ -98,7 +98,7 @@ deploy-with-servicebus.bat
 
 ---
 
-## ?? **Auto Scaling Configurado**
+## 📈 **Auto Scaling Configurado**
 
 | Serviço | Min Pods | Max Pods | Trigger |
 |---------|----------|----------|---------|
@@ -108,7 +108,7 @@ deploy-with-servicebus.bat
 
 ---
 
-## ?? **Application Performance Monitoring**
+## 🔍 **Application Performance Monitoring**
 
 ### **Acessar Application Insights:**
 
@@ -119,21 +119,21 @@ get-appinsights-link.bat
 
 Ou acesse diretamente:
 ```
-https://portal.azure.com ? Pesquisar "fcg-appinsights"
+https://portal.azure.com → Pesquisar "fcg-appinsights"
 ```
 
 ### **Métricas Disponíveis:**
-- ? **Live Metrics**: Tempo real
-- ? **Application Map**: Arquitetura visual
-- ? **Performance**: Análise de latência
-- ? **Failures**: Exceções e stack traces
-- ? **Logs**: Query com KQL
+- ✅ **Live Metrics**: Tempo real
+- ✅ **Application Map**: Arquitetura visual
+- ✅ **Performance**: Análise de latência
+- ✅ **Failures**: Exceções e stack traces
+- ✅ **Logs**: Query com KQL
 
 Veja detalhes em: [`APM-README.md`](./APM-README.md)
 
 ---
 
-## ?? **Acessar os Serviços**
+## 🌐 **Acessar os Serviços**
 
 Após o deploy, obtenha os IPs públicos:
 
@@ -148,7 +148,7 @@ kubectl get services -n fcg-tutorial
 
 ---
 
-## ?? **Custos Estimados (24/7)**
+## 💰 **Custos Estimados (24/7)**
 
 | Recurso | Custo Mensal |
 |---------|--------------|
@@ -161,7 +161,7 @@ kubectl get services -n fcg-tutorial
 
 ---
 
-## ??? **Limpeza Completa**
+## 🗑️ **Limpeza Completa**
 
 Para deletar **TODOS** os recursos:
 
@@ -170,16 +170,16 @@ az group delete --name FCG-Infra --yes --no-wait
 ```
 
 Isso remove:
-- ? Cluster AKS
-- ? Service Bus + filas
-- ? Application Insights
-- ? Load Balancers
-- ? IPs públicos
-- ? VMs e discos
+- ✅ Cluster AKS
+- ✅ Service Bus + filas
+- ✅ Application Insights
+- ✅ Load Balancers
+- ✅ IPs públicos
+- ✅ VMs e discos
 
 ---
 
-## ?? **Testar a Solução**
+## 🧪 **Testar a Solução**
 
 ### **1. Verificar Pods:**
 ```cmd
@@ -203,7 +203,7 @@ kubectl get hpa -n fcg-tutorial --watch
 
 ---
 
-## ?? **Documentação Completa**
+## 📚 **Documentação Completa**
 
 - **[APM-README.md](./APM-README.md)**: Guia completo de Application Insights
 - **[apresentacao_fiap.md](./apresentacao_fiap.md)**: Apresentação técnica para FIAP
@@ -212,18 +212,18 @@ kubectl get hpa -n fcg-tutorial --watch
 
 ---
 
-## ?? **Para Apresentação FIAP**
+## 🎓 **Para Apresentação FIAP**
 
 Use o arquivo [`apresentacao_fiap.md`](./apresentacao_fiap.md) que contém:
-- ? Visão geral da arquitetura
-- ? Conceitos fundamentais (Kubernetes, HPA, APM)
-- ? Explicação detalhada de cada passo
-- ? Diagramas e estimativa de custos
-- ? Boas práticas implementadas
+- ✅ Visão geral da arquitetura
+- ✅ Conceitos fundamentais (Kubernetes, HPA, APM)
+- ✅ Explicação detalhada de cada passo
+- ✅ Diagramas e estimativa de custos
+- ✅ Boas práticas implementadas
 
 ---
 
-## ?? **Repositórios GitHub**
+## 🔗 **Repositórios GitHub**
 
 - **FCG Service**: https://github.com/dtpontes/FCG
 - **Games Service**: https://github.com/dtpontes/FCG.Games
@@ -232,62 +232,62 @@ Use o arquivo [`apresentacao_fiap.md`](./apresentacao_fiap.md) que contém:
 
 ---
 
-## ? **Arquitetura Implementada**
+## ✅ **Arquitetura Implementada**
 
 ```
-???????????????????????????????????????????????
-?         Azure Resource Group (FCG-Infra)    ?
-?                                             ?
-?  ????????????????????????????????????????? ?
-?  ?   Azure Service Bus                   ? ?
-?  ?   • sale-processing-queue             ? ?
-?  ?   • payment-processing-queue          ? ?
-?  ?   • response-payment-processing-queue ? ?
-?  ????????????????????????????????????????? ?
-?                                             ?
-?  ????????????????????????????????????????? ?
-?  ?   Application Insights (APM)          ? ?
-?  ?   • Live Metrics                      ? ?
-?  ?   • Distributed Tracing               ? ?
-?  ?   • Performance Analysis              ? ?
-?  ????????????????????????????????????????? ?
-?                                             ?
-?  ????????????????????????????????????????? ?
-?  ?   AKS Cluster (FCG-Cluster)           ? ?
-?  ?                                       ? ?
-?  ?   ???????????????????????????????    ? ?
-?  ?   ? Namespace: fcg-tutorial     ?    ? ?
-?  ?   ?                             ?    ? ?
-?  ?   ? • SQL Server (3 databases)  ?    ? ?
-?  ?   ? • FCG Service (HPA 1-5)     ?    ? ?
-?  ?   ? • Games Service (HPA 1-10)  ?    ? ?
-?  ?   ? • Payments Service (HPA 2-8)?    ? ?
-?  ?   ?                             ?    ? ?
-?  ?   ? LoadBalancers:              ?    ? ?
-?  ?   ? • FCG (IP público)          ?    ? ?
-?  ?   ? • Games (IP público)        ?    ? ?
-?  ?   ? • Payments (IP público)     ?    ? ?
-?  ?   ???????????????????????????????    ? ?
-?  ????????????????????????????????????????? ?
-???????????????????????????????????????????????
+┌─────────────────────────────────────────────┐
+│         Azure Resource Group (FCG-Infra)    │
+│                                             │
+│  ┌───────────────────────────────────────┐ │
+│  │   Azure Service Bus                   │ │
+│  │   • sale-processing-queue             │ │
+│  │   • payment-processing-queue          │ │
+│  │   • response-payment-processing-queue │ │
+│  └───────────────────────────────────────┘ │
+│                                             │
+│  ┌───────────────────────────────────────┐ │
+│  │   Application Insights (APM)          │ │
+│  │   • Live Metrics                      │ │
+│  │   • Distributed Tracing               │ │
+│  │   • Performance Analysis              │ │
+│  └───────────────────────────────────────┘ │
+│                                             │
+│  ┌───────────────────────────────────────┐ │
+│  │   AKS Cluster (FCG-Cluster)           │ │
+│  │                                       │ │
+│  │   ┌─────────────────────────────┐    │ │
+│  │   │ Namespace: fcg-tutorial     │    │ │
+│  │   │                             │    │ │
+│  │   │ • SQL Server (3 databases)  │    │ │
+│  │   │ • FCG Service (HPA 1-5)     │    │ │
+│  │   │ • Games Service (HPA 1-10)  │    │ │
+│  │   │ • Payments Service (HPA 2-8)│    │ │
+│  │   │                             │    │ │
+│  │   │ LoadBalancers:              │    │ │
+│  │   │ • FCG (IP público)          │    │ │
+│  │   │ • Games (IP público)        │    │ │
+│  │   │ • Payments (IP público)     │    │ │
+│  │   └─────────────────────────────┘    │ │
+│  └───────────────────────────────────────┘ │
+└─────────────────────────────────────────────┘
 ```
 
 ---
 
-## ?? **Boas Práticas Implementadas**
+## 🏆 **Boas Práticas Implementadas**
 
-- ? **Infrastructure as Code (IaC)**: Scripts automatizados
-- ? **Database per Service**: Isolamento de dados
-- ? **Auto Scaling (HPA)**: Escalabilidade automática
-- ? **Health Checks**: Readiness/Liveness probes
-- ? **Secrets Management**: Credenciais via K8s Secrets
-- ? **Observability**: Application Insights para APM
-- ? **Messaging**: Comunicação assíncrona via Service Bus
-- ? **Zero Downtime**: Rolling updates
-- ? **Resource Limits**: Controle de CPU/memória
+- ✅ **Infrastructure as Code (IaC)**: Scripts automatizados
+- ✅ **Database per Service**: Isolamento de dados
+- ✅ **Auto Scaling (HPA)**: Escalabilidade automática
+- ✅ **Health Checks**: Readiness/Liveness probes
+- ✅ **Secrets Management**: Credenciais via K8s Secrets
+- ✅ **Observability**: Application Insights para APM
+- ✅ **Messaging**: Comunicação assíncrona via Service Bus
+- ✅ **Zero Downtime**: Rolling updates
+- ✅ **Resource Limits**: Controle de CPU/memória
 
 ---
 
-**Desenvolvido por:** Daniel Pontes  
+**Desenvolvido por:** Grupo 118  
 **Para:** Apresentação FIAP - Microsserviços e Kubernetes  
 **Repositório:** https://github.com/dtpontes/FCG.Infra
